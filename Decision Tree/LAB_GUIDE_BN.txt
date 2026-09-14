@@ -1,0 +1,53 @@
+ID3 DECISION TREE — ML LAB GUIDE
+================================
+
+উদ্দেশ্য
+Weather-এর categorical feature দেখে Play=Yes/No predict করা। এটি supervised
+classification, কারণ dataset-এ প্রতিটি sample-এর target Play আগে থেকেই আছে।
+
+Dataset
+decision_tree_data_1000.csv-তে 1000টি row। Features: Outlook, Temp, Humidity,
+Wind। Target: Play। প্রতিটি row একটি দিনের weather ও সেই দিনের সিদ্ধান্ত।
+কোনো value খালি হতে পারবে না এবং Play-তে ঠিক দুইটি class থাকতে হবে।
+
+অ্যাপ চালানো
+Start Decision Tree.vbs double-click করো। Dataset tab-এ data table দেখো। নিজের
+CSV হলে একই feature columns ও Play target রেখে Load CSV চাপো।
+
+Training
+Train / Evaluate চাপলে class ratio বজায় রেখে 80% training এবং 20% test split
+হয় (seed=42)। Test rows এই সময় model শেখে না। Training rows-এর ভেতরে 5-fold
+cross-validation max_depth 1..5 পরীক্ষা করে। সমান score হলে ছোট depth নেয়।
+তারপর সব training row দিয়ে selected depth-এ final tree বানায় এবং একবার test
+set-এ evaluate করে।
+
+ID3 হিসাব
+Entropy: H(S) = -sum p(c) log2 p(c)
+Information Gain: Gain(S,A) = H(S) - sum |Sv|/|S| H(Sv)
+প্রতি node-এ সবচেয়ে বেশি gain-এর feature দিয়ে data ভাগ হয়। Pure node, feature
+শেষ, gain শূন্য, অথবা max_depth হলে leaf হয়। Leaf-এর majority class prediction।
+
+Output
+Train tab-এ split size, root entropy, root gains, প্রতিটি depth-এর CV score,
+selected depth, test Accuracy/Precision/Recall/F1/ROC-AUC এবং confusion matrix।
+Tree diagram tab-এ rectangle decision node, oval leaf এবং arrow-এর value দেখা যায়।
+ROC-AUC accuracy-এর copy নয়; test sample-এর leaf P(Yes) score-এর ranking থেকে হয়।
+
+স্যারের input
+New input tab-এ Outlook, Temp, Humidity, Wind dropdown থেকে value দিয়ে Predict
+Play চাপো। Output Play=Yes/No, root-to-leaf decision path, leaf counts এবং
+P(Yes) দেখাবে। নতুন input training data বদলায় না।
+
+Demo order
+Dataset দেখাও → Train/Evaluate → entropy ও gain বোঝাও → tree diagram দেখাও →
+স্যারের values নিয়ে prediction → decision path বোঝাও → report save করো।
+
+Viva
+Decision Tree supervised কেন? Entropy কী মাপে? Gain বেশি হলে কী বোঝায়?
+Train/test আলাদা কেন? CV শুধু training-এ কেন? max_depth overfitting কীভাবে কমায়?
+Confusion matrix-এর TP/TN/FP/FN কী? Accuracy ও ROC-AUC কেন এক নয়?
+
+সীমা
+এই implementation categorical feature-এর ID3। Missing value নেই। Unseen value
+এলে বর্তমান node-এর training majority ব্যবহার করে। ফল dataset ও split-এর ওপর
+নির্ভর করে; test metrics ভবিষ্যতের নিশ্চয়তা নয়।

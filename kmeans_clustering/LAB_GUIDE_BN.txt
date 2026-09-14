@@ -1,0 +1,119 @@
+K-MEANS CLUSTERING — ML LAB নির্দেশিকা
+====================================
+
+১. উদ্দেশ্য
+দূরত্বের ভিত্তিতে একই ধরনের পয়েন্টকে kটি group বা cluster-এ ভাগ করা।
+এটি unsupervised learning: training data-তে আগে থেকে সঠিক cluster দেওয়া নেই।
+এই অ্যাপে algorithm নিজে Python দিয়ে লেখা; sklearn ব্যবহার করা হয়নি।
+
+২. অ্যাপ চালানো
+Start KMeans.vbs ফাইলে ডাবল-ক্লিক করো। GUI খুলবে; CLI-তে input দিতে হবে না।
+কম্পিউটারে Python 3 ও Tkinter থাকতে হবে। গ্রাফের জন্য Matplotlib লাগে; ML ফোল্ডারের .venv-তে ইনস্টল করা আছে।
+Launcher এই environment ব্যবহার করে। নতুন কম্পিউটারে requirements.txt থেকে
+Matplotlib ইনস্টল করতে হবে। অ্যালগরিদমে sklearn ব্যবহার করা হয়নি।
+প্রথম Dataset tab-এ উদাহরণের ৭টি পয়েন্ট দেখা যাবে।
+
+৩. Dataset বুঝি
+kmeans_data.csv একটি comma-separated text file। প্রথম row হলো column names:
+label,x,y
+P1,1,1
+P2,1.5,2
+P3,3,4
+P4,5,7
+P5,3.5,5
+P6,4.5,5
+P7,3.5,4.5
+
+প্রতি row একটি sample। x ও y দুটি numerical feature।
+label হলো পয়েন্টের ID, target class নয়। Clustering-এ শুধু x,y ব্যবহার হয়।
+এগুলো শেখার জন্য 2D coordinate; আয়/বয়সের মতো বাস্তব অর্থ দেওয়া নেই।
+CSV-তে x,y থাকা আবশ্যক। label না থাকলে স্বয়ংক্রিয়ভাবে P1,P2... নাম হবে।
+ID আলাদা হতে হবে। x,y খালি, text, NaN বা infinity হতে পারবে না।
+এই teaching app সর্বোচ্চ ১০০টি sample নেয়।
+
+৪. Dataset read ও পরিবর্তন
+Dataset → Load CSV → নিজের CSV নির্বাচন করো। টেবিলে ডেটা দেখা যাবে।
+কোডে csv.DictReader column name ধরে পড়ে; float() x,y-কে সংখ্যায় বদলায়।
+নিজে input দিতে নিচে ID, x, y লিখে Add point চাপো।
+Row select করলে input ঘরে মান আসবে; বদলে Update selected চাপো।
+Delete selected দিয়ে নির্বাচিত row সরাও। Save dataset CSV দিয়ে পরিবর্তন রাখো।
+Restore example চাপলে মূল উদাহরণ ফিরে আসে, যদি মূল CSV overwrite না করো।
+নিজের dataset আলাদা নামে save করা ভালো।
+
+৫. Training — ধাপে ধাপে
+Train & graph tab-এ যাও। k দিয়ে কয়টি group চাও তা নির্ধারণ করো।
+শর্ত: 1 <= k <= sample সংখ্যা। এই উদাহরণে k=1 থেকে 7।
+Prepare centroids চাপলে kটি initial centroid-এর x,y ঘর তৈরি হবে।
+শুরুর মান দেওয়া হয় প্রথম পয়েন্ট এবং এরপর আগের কেন্দ্রগুলো থেকে দূরের পয়েন্ট নিয়ে।
+ডিফল্ট উদাহরণে k=2 হলে C1=(1,1), C2=(5,7)। চাইলে স্যার এগুলো বদলাবেন।
+Run K-Means চাপো।
+
+Algorithm (Lloyd's algorithm):
+ক. প্রতি পয়েন্ট থেকে প্রতিটি centroid-এর Euclidean distance বের করো:
+   d(P,C) = sqrt((Px-Cx)^2 + (Py-Cy)^2)
+খ. যে centroid কাছে, পয়েন্টকে সেই cluster-এ রাখো।
+   দূরত্ব সমান হলে ছোট cluster number নেওয়া হয়।
+গ. প্রতি cluster-এর x-এর গড় ও y-এর গড় নিয়ে নতুন centroid তৈরি করো:
+   Cx = sum(x)/member_count; Cy = sum(y)/member_count
+ঘ. আবার distance ও assignment হিসাব করো।
+ঙ. আগের pass-এর assignment অপরিবর্তিত থাকলে convergence; থামো।
+   সর্বোচ্চ 100 pass। সীমায় পৌঁছালে convergence নিশ্চিত বলা হয় না।
+   কোনো cluster খালি হলে সেটিকে active centroidগুলো থেকে সবচেয়ে দূরের data
+   point-এ বসিয়ে পরের pass চালানো হয়। k unique data point-এর চেয়ে বড় হতে পারবে না।
+
+Calculations tab-এ substituted distance equations, সদস্যদের তালিকা,
+mean-এর হিসাব ও final result দেখা যাবে। সব সংখ্যা পুরো precision-এ হিসাব হয়;
+প্রদর্শনের সময় বেশিরভাগ ফল ৪ decimal-এ round করা হয়।
+
+৬. ডিফল্ট উদাহরণের হাতে যাচাই
+প্রথম pass: C1-এ P1,P2,P3; C2-এ P4,P5,P6,P7।
+P3 দুই কেন্দ্র থেকে সমান দূরে (প্রায় 3.6056), তাই Cluster 1 নেয়।
+নতুন C1=((1+1.5+3)/3, (1+2+4)/3)=(1.8333,2.3333)।
+নতুন C2=(4.125,5.375)।
+দ্বিতীয় pass-এ P3 Cluster 2-এ যায়।
+Final C1=(1.25,1.5), সদস্য P1,P2।
+Final C2=(3.9,5.1), সদস্য P3,P4,P5,P6,P7।
+তৃতীয় assignment pass-এ পরিবর্তন নেই: convergence নিশ্চিত হয়।
+অর্থাৎ ২টি পরিবর্তনসহ pass + ১টি final stability check।
+WCSS=8.525। WCSS হলো নিজ নিজ centroid থেকে squared distance-এর যোগফল।
+এটি accuracy percentage নয়; dataset-এ true class নেই।
+
+৭. স্যারের নতুন input ও output
+New input tab → x=2, y=2 → Predict cluster।
+ডিফল্ট training-এ d(P,C1)≈0.9014, d(P,C2)≈3.6359।
+Output: Cluster 1, কারণ C1 কাছে।
+Graph-এ নতুন পয়েন্ট কালো diamond হিসেবে দেখা যাবে।
+এ সময় training data বা centroid বদলায় না। Dataset-এ যোগ করতে Add point
+ব্যবহার করে আবার training চালাতে হবে। Cluster 1/2 মানে ভালো/খারাপ নয়।
+
+৮. k পরিবর্তন ও Elbow method
+k=3 দিয়ে Prepare centroids → Run K-Means করে ফল তুলনা করো।
+Elbow বাটন k=1 থেকে unique point সংখ্যা পর্যন্ত WCSS দেখায়।
+Dataset বদলালে k input-এর সর্বোচ্চ মান ও Elbow button-এর range নিজে বদলায়।
+যেখানে WCSS কমার গতি ধীর হয়, সেই bend সম্ভাব্য k বোঝাতে পারে।
+অ্যাপ নিজে k বেছে নেয় না। সব dataset-এ স্পষ্ট elbow থাকবেই এমন নয়।
+ছোট সমস্যায় <=100 seed combinations হলে সব চেষ্টা করা হয়। অন্যথায়
+20 deterministic restarts ব্যবহার হয় (random seed 42)। এটি best observed
+WCSS; global optimum-এর নিশ্চয়তা নয়। k=7-এ সাতটি আলাদা পয়েন্টের জন্য
+WCSS শূন্য হতে পারে, কিন্তু বেশি k মানেই বেশি অর্থপূর্ণ grouping নয়।
+
+৯. রিপোর্ট
+Training শেষে Save report → TXT অথবা CSV। এতে dataset, k, iteration-এর
+হিসাব, final result, চালানো থাকলে elbow results এবং সর্বশেষ prediction থাকে।
+CSV report-এ প্রতি row একটি report line; এটি input dataset CSV নয়।
+Dataset, k বা initial centroid বদলালে আগের model/report/prediction মুছে যায়;
+আবার train করতে হবে। Dataset বদলালে পুরোনো elbow results-ও মুছে যায়।
+
+১০. সীমা ও viva প্রস্তুতি
+এখানে দুই numerical feature, raw distance, কোনো scaling নেই। বাস্তব feature
+যেমন আয় ও বয়সের scale আলাদা হলে preprocessing/scaling দরকার হতে পারে।
+Initial centroid বদলালে ফল বদলাতে পারে। K-means outlier-এর প্রতি সংবেদনশীল।
+Duplicate points বা খারাপ seed-এর কারণে সব kটি cluster nonempty নাও হতে পারে।
+মূল প্রশ্ন: k কী? centroid কী? unsupervised কেন? point কেন ওই cluster-এ গেল?
+centroid কীভাবে বদলাল? algorithm কেন থামল? WCSS ও accuracy কি একই?
+
+ফাইল ধরে কোড পড়া:
+kmeans_core.py: load_points_csv → assign_clusters → update_centroids →
+kmeans_full → wcss → elbow_method।
+kmeans_app.py: GUI input → core functions → calculations, graph ও report।
+kmeans_app_original.py: আগের version-এর backup; নতুন অ্যাপের প্রয়োজন নেই।

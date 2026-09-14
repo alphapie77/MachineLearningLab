@@ -1,0 +1,47 @@
+LINEAR SVM — ML LAB GUIDE
+=========================
+
+উদ্দেশ্য
+দুটি numerical feature x,y থেকে class +1 বা -1 predict করা। এটি supervised
+binary classification; label column হলো জানা target। Dataset-এ 500টি sample।
+
+চালানো ও workflow
+Start Linear SVM.vbs double-click → Load CSV/Generate Data → Train/Evaluate →
+model information ও graph দেখো → নতুন x,y দিয়ে Classify Point → report save।
+নিজের CSV-তে x,y,label থাকতে হবে; label শুধু -1 বা +1। অন্তত 20 rows এবং প্রতি
+class-এ অন্তত 5 samples দরকার। NaN/Infinity/খালি/ভুল label reject হয়।
+
+Data split ও scaling
+Class ratio বজায় রেখে 80% train, 20% test (seed=1)। Mean ও standard deviation
+শুধু training data থেকে শেখা হয়: z=(x-mu)/sigma। একই mu,sigma test ও নতুন input-এ
+ব্যবহার হয়। Test data দিয়ে scaling শেখালে data leakage হতো।
+
+Training
+Soft-margin objective: J = lambda/2 ||w||^2 + (1/n) sum max(0,1-y f(x))
+যেখানে lambda=1/(C*n), f(x)=w.x+b। Pegasos প্রতি shuffled sample-এ eta=1/(lambda*t)
+ব্যবহার করে। Margin y*f(x)<1 হলে:
+w=(1-eta*lambda)w + eta*y*x; b=b+eta*y। অন্যথায় শুধু weight decay।
+
+C selection
+C candidates 0.01,0.1,1,10,100। Training rows-এর ভেতরে 5-fold CV হয়। প্রতি fold-এ
+scaler কেবল সেই fold-এর fitting rows থেকে শেখে। সর্বোচ্চ mean validation accuracy-এর
+C নিয়ে সব training rows-এ final model train হয়। Untouched test set-এ একবার evaluation।
+
+Output
+Hyperplane w.x+b=0; margins w.x+b=+1 এবং -1। Predicted class: f(x)>=0 হলে +1,
+অন্যথায় -1। Graph-এ train points, test points, support vectors, boundary ও margin।
+Metrics: confusion matrix, accuracy, precision, recall, F1, ROC curve ও AUC।
+
+স্যারের input
+New classification অংশে raw x,y লিখে Classify Point। App training-set mu,sigma দিয়ে
+standardize করে f(x)=w1*zx+w2*zy+b substituted calculation দেখায়। নতুন point model
+retrain করে না; graph-এ star হিসেবে আসে।
+
+Viva
+SVM কী maximize করে? Hyperplane/margin/support vector কী? C বড়/ছোট হলে কী হয়?
+Scaling কেন দরকার? Test set আলাদা কেন? CV কেন? f(x)-এর sign কী বোঝায়?
+Linear SVM concentric-circle data-তে কেন ভালো নয়?
+
+সীমা
+এই lab দুই numerical feature ও দুই class-এর জন্য। Dataset linearly separable না হলে
+linear boundary যথেষ্ট নাও হতে পারে। Metrics এই deterministic split-এর estimate।

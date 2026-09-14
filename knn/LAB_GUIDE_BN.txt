@@ -1,0 +1,23 @@
+KNN SHIRT SIZE CLASSIFICATION — বাংলা LAB ও VIVA GUIDE
+
+উদ্দেশ্য: Height ও weight থেকে K-Nearest Neighbours ব্যবহার করে shirt size predict করা।
+
+KNN একটি supervised, lazy-learning algorithm। নতুন point এলে training data-র প্রতিটি point-এর সঙ্গে Euclidean distance হিসাব করে সবচেয়ে কাছের kটি neighbour নেওয়া হয়। Majority vote পাওয়া class-ই prediction।
+
+সঠিক pipeline:
+Dataset → stratified 80/20 train-test split → শুধু training data থেকে standardization → training set-এর মধ্যে leakage-free 5-fold CV → macro-F1 দিয়ে best k → untouched test evaluation → new input prediction।
+
+Scaling প্রয়োজন, কারণ height ও weight-এর unit/range আলাদা। Test বা new input-এ training mean ও standard deviation-ই ব্যবহার করতে হবে।
+
+Dataset-এ M class অনেক বেশি। শুধু accuracy দেখলে minority L class-এর খারাপ ফল লুকাতে পারে। তাই per-class precision/recall/F1 এবং macro-F1 দেখানো হয়েছে।
+
+GUI ব্যবহার:
+Dataset tab → Train/Evaluate tab-এ Run → Confusion & ROC → New Input-এ height ও weight → Classify। নিচে nearest neighbours, scaled distance, votes ও final prediction দেখা যাবে।
+
+Viva:
+- KNN-এর k হলো কয়জন neighbour vote দেবে; K-means-এর k হলো কয়টি cluster হবে।
+- KNN weight শেখে না, তাই lazy learner।
+- ছোট k noise-sensitive; বড় k boundary অতিরিক্ত smooth করে।
+- Test set দিয়ে k নির্বাচন করলে data leakage হয়।
+- Euclidean distance = sqrt((x1-x2)^2 + (y1-y2)^2)।
+- ROC positive class graph legend-এ লেখা আছে।

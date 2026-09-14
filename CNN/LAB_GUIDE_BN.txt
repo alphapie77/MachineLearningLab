@@ -1,0 +1,33 @@
+CNN CAT vs DOG — ML LAB GUIDE
+=============================
+
+এটি pretrained ImageNet demo নয়; CIFAR-10-এর labeled cat/dog images দিয়ে একটি
+binary CNN train হয়। CIFAR-10 class 3=Cat, class 5=Dog; image 32×32 RGB।
+
+১) Dataset tab: প্রতি class-এর training image সংখ্যা 100–5000 দাও, Prepare চাপো।
+প্রথমবার internet থেকে CIFAR-10 download হবে। Selected data-এর 80% train, 20%
+validation; official CIFAR test-এর 2000 cat/dog image একেবারে untouched থাকে।
+Pixels [0,255] থেকে [0,1] normalize হয়। Seed=42।
+
+২) Train tab: epochs 1–20 দিয়ে Train CNN। Architecture:
+Conv2D(32,3×3,ReLU) → MaxPool → Conv2D(64,3×3,ReLU) → MaxPool → Flatten →
+Dense(64,ReLU) → Dropout(0.3) → Dense(1,Sigmoid)। Adam optimizer এবং binary
+cross-entropy loss। Training background-এ চলে; graph-এ train/validation loss ও
+accuracy দেখা যায়। শেষে cat_dog_cnn.keras model save হয়।
+
+৩) Evaluation: untouched official test set-এ loss, accuracy, dog-class precision,
+recall, F1 ও confusion matrix। Validation model শেখার সময় monitoring-এর জন্য;
+test শুধু final evaluation।
+
+৪) Image input: saved/trained model load করে JPG/PNG/BMP/WebP নির্বাচন। Image RGB,
+32×32 resize ও /255 normalize হয়। Sigmoid P(Dog)>=0.5 হলে DOG, নইলে CAT। স্যারের
+image-ই input। External high-resolution photo ও CIFAR tiny image-এর distribution
+আলাদা, তাই confidence guarantee নয়। Corrupt বা 8×8-এর ছোট image reject হয়।
+
+Demo: Prepare dataset → 5 epochs Train → history graph → evaluation → স্যারের image
+choose → preprocessing ও sigmoid output বোঝাও → report save। প্রথমবার আগেই dataset
+download ও model train করে রাখা ভালো; পরীক্ষায় Load saved model চাপলে দ্রুত prediction।
+
+Viva: convolution/filter কী? ReLU, pooling, flatten, dense, sigmoid কী? epoch ও batch
+কী? train/validation/test আলাদা কেন? overfitting কীভাবে graph-এ বোঝা যায়? confusion
+matrix, precision ও recall কী? normalization কেন?

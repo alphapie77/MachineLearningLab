@@ -1,0 +1,29 @@
+NON-LINEAR SVM (RBF KERNEL) — ML LAB GUIDE
+==========================================
+
+Dataset-এ 500টি x,y sample ও target label -1/+1। +1 inner ring, -1 outer ring;
+তাই straight line দিয়ে আলাদা করা যায় না। এটি supervised binary classification।
+
+Start Nonlinear SVM.vbs double-click → dataset load/generate → Train/Evaluate →
+curved boundary ও metrics → নতুন raw x,y classify → report save। CSV-তে x,y,label,
+কমপক্ষে 30 rows এবং প্রতি class-এ 6 samples; invalid/NaN/Infinity reject হয়।
+
+Class ratio রেখে 80% train/20% untouched test। z=(x-mu)/sigma scaler শুধু training
+data থেকে শেখে। 3-fold CV-তে প্রতি fold-এর scaler-ও শুধু fitting rows থেকে শেখে।
+
+RBF kernel: K(x,x')=exp(-gamma*||x-x'||^2)। এটি original 2D space-এ curved
+boundary তৈরি করতে পারে। C misclassification penalty নিয়ন্ত্রণ করে; gamma একটি
+sample-এর influence কত দূর ছড়াবে তা নিয়ন্ত্রণ করে। Grid: C={0.5,1,5},
+gamma={0.2,0.5,1}; 9 combinations, প্রতিটির 3-fold CV। Best pair দিয়ে final SMO।
+
+Simplified SMO dual problem-এর alpha জোড়া update করে। alpha>0 training points হলো
+support vectors। Decision: f(x)=sum alpha_i*y_i*K(x_i,x)+b; f>=0 হলে +1, নইলে -1।
+
+Output-এ CV table, selected C/gamma, support vectors, substituted kernel example,
+confusion matrix, Accuracy/Precision/Recall/F1, ROC-AUC, ROC curve ও boundary আছে।
+New point training scaler দিয়ে transform হয়; prediction model retrain করে না।
+
+Viva: linear/RBF পার্থক্য কী? Kernel trick কী? C/gamma কী করে? support vector কী?
+Scaling, CV ও untouched test কেন? বেশি gamma কীভাবে overfitting করতে পারে?
+
+Training কয়েক সেকেন্ড লাগতে পারে। Metrics এই split-এর estimate, guarantee নয়।
