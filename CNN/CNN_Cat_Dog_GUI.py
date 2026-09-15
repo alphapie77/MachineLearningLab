@@ -65,6 +65,12 @@ class CNNApp:
         bar=ttk.Frame(self.input_tab); bar.pack(fill='x')
         ttk.Button(bar,text='Choose Cat/Dog Image',command=self.choose_image).pack(side='left',padx=5)
         self.pred_label=ttk.Label(bar,text='Prediction: —',font=('Segoe UI',15,'bold')); self.pred_label.pack(side='left',padx=15)
+        ttk.Label(
+            self.input_tab,
+            text='Important: This binary model only distinguishes Cat from Dog. '
+                 'An unrelated image will still be assigned to one of these two classes.',
+            wraplength=1080
+        ).pack(anchor='w', padx=5, pady=(10, 0))
         body=ttk.Frame(self.input_tab); body.pack(fill='both',expand=True,pady=12)
         self.image_label=ttk.Label(body,text='Choose a JPG/PNG/BMP/WebP image',anchor='center'); self.image_label.pack(side='left',fill='both',expand=True)
         self.pred_text=tk.Text(body,width=55,wrap='word',font=('Consolas',10)); self.pred_text.pack(side='left',fill='both',expand=True,padx=(10,0))
@@ -179,7 +185,7 @@ class CNNApp:
             label='DOG' if probability>=.5 else 'CAT'; confidence=probability if label=='DOG' else 1-probability
             self.last_prediction=dict(path=path,label=label,dog_probability=probability,confidence=confidence,original=image.size)
             self.pred_label.config(text=f'Prediction: {label} ({confidence*100:.2f}%) · {Path(path).name}'); self.pred_text.delete('1.0','end')
-            self.pred_text.insert('1.0',f'INPUT\nFile: {path}\nOriginal size: {image.width}×{image.height}\nConverted to RGB\nResized to 32×32\nNormalized: pixel/255\n\nMODEL OUTPUT\nSigmoid P(Dog)={probability:.6f}\nThreshold=0.5\nPrediction={label}\nClass confidence={confidence:.6f}\n\nExternal photos differ from tiny CIFAR-10 images, so confidence is not a guarantee.')
+            self.pred_text.insert('1.0',f'INPUT\nFile: {path}\nOriginal size: {image.width}×{image.height}\nConverted to RGB\nResized to 32×32\nNormalized: pixel/255\n\nMODEL OUTPUT\nSigmoid P(Dog)={probability:.6f}\nThreshold=0.5\nPrediction={label}\nClass confidence={confidence:.6f}\n\nLIMITATION\nThis binary model only distinguishes Cat from Dog. An unrelated image is still forced into one of these classes. External photos also differ from tiny CIFAR-10 images, so confidence is not a guarantee.')
         except Exception as e: messagebox.showerror('Image error',str(e))
 
     def report(self):
